@@ -1,11 +1,9 @@
-import { useState } from 'react';
-import Web3 from 'web3';
-import SHA256 from 'crypto-js/sha256';
-import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// VerifyProduct.jsx (Starter)
+import { useState } from "react";
+import Web3 from "web3";
+import SHA256 from "crypto-js/sha256";
 
-const CONTRACT_ADDRESS = '0x316C2435Bb89b3100396E3285b39dDE2D21B4a56';
+const CONTRACT_ADDRESS = "0x316C2435Bb89b3100396E3285b39dDE2D21B4a56";
 const CONTRACT_ABI = [
 	{
 		"inputs": [
@@ -674,87 +672,56 @@ const CONTRACT_ABI = [
 		"stateMutability": "view",
 		"type": "function"
 	}
-]; 
+];
 
-function App() {
-  const [loading, setLoading] = useState(false);
-
-  const handleRegister = async () => {
-    setLoading(true);
-
-    const name = document.getElementById('ProductName').value;
-    const serial = document.getElementById('SerialNumber').value;
+export default function VerifyProduct() {
+  const [status, setStatus] = useState("");
+  
+  const verifyProduct = async () => {
+    const tokenId = document.getElementById("tokenId").value;
+    const name = document.getElementById("name").value;
+	const serial = document.getElementById('SerialNumber').value;
     const model = document.getElementById('ModelNumber').value;
-    const type = document.getElementById('ProductType').value;
-    const color = document.getElementById('ProductColor').value;
-    const date = document.getElementById('ProductDate').value;
+    const type = document.getElementById("type").value;
+    const color = document.getElementById("color").value;
+    const date = document.getElementById("date").value;
 
     const metadata = JSON.stringify({ name, serial, model, type, color, date });
-    const metadataHash = SHA256(metadata).toString();
+    const expectedHash = SHA256(metadata).toString();
+	// console.log(expectedHash);
+    const web3 = new Web3(window.ethereum);
+    const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
 
-    if (window.ethereum) {
-      try {
-        const web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3.eth.getAccounts();
-        const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+    try {
+      const details = await contract.methods.getProductDetails(tokenId).call();
+      const onChainHash = details[0];
+	//   console.log(onChainHash);
 
-        const tx = await contract.methods
-          .mintProduct("0x" + metadataHash)
-          .send({ from: accounts[0] });
-
-        const tokenId = tx.events.ProductMinted.returnValues[0].toString();
-        const details = await contract.methods.getProductDetails(tokenId).call();
-
-        // Send to backend
-        await axios.post('http://127.0.0.1:5000/api/register', {
-          name,
-          serial,
-          model,
-          type,
-          color,
-          date,
-          tokenId,
-          metadataHash: details[0],
-          manufacturer: details[1],
-          owner: details[2],
-        });
-
-        toast.success("✅ Product registered successfully!");
-      } catch (err) {
-        console.error(err);
-        toast.error("❌ Error: " + err.message);
-      } finally {
-        setLoading(false);
+      if (expectedHash === onChainHash.replace("0x", "")) {
+        setStatus("✅ Product is verified and authentic.");
+      } else {
+        setStatus("❌ Metadata does not match blockchain hash.");
       }
-    } else {
-      toast.error("Please install MetaMask.");
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setStatus("❌ Error verifying product.");
     }
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h2 className="text-xl font-semibold mb-4">Register Product</h2>
+    <div className="p-4 bg-black/60">
+      <h2 className="font-bold text-white/90 text-lg mb-4">Verify Product</h2>
+      <input id="tokenId" placeholder="Token ID" className="px-2 py-1 border-2 border-black shadow-lg bg-black/20 mx-2 rounded-lg" />
+      <input id="name" placeholder="Product Name" className="px-2 py-1 border-2 border-black shadow-lg bg-black/20 mx-2 rounded-lg" />
 
-      <input id="ProductName" placeholder="Product Name" className="mb-2 p-2 border rounded w-80" />
-      <input id="SerialNumber" placeholder="Serial Number" className="mb-2 p-2 border rounded w-80" />
-      <input id="ModelNumber" placeholder="Model Number" className="mb-2 p-2 border rounded w-80" />
-      <input id="ProductType" placeholder="Type" className="mb-2 p-2 border rounded w-80" />
-      <input id="ProductColor" placeholder="Color" className="mb-2 p-2 border rounded w-80" />
-      <input id="ProductDate" placeholder="Date of Manufacture" className="mb-2 p-2 border rounded w-80" />
+	  <input id="SerialNumber" placeholder="Serial Number" className="px-2 py-1 border-2 border-black shadow-lg bg-black/20 mx-2 rounded-lg" />
+      <input id="ModelNumber" placeholder="Model Number" className="px-2 py-1 border-2 border-black shadow-lg bg-black/20 mx-2 rounded-lg" />
 
-      <button
-        onClick={handleRegister}
-        disabled={loading}
-        className="p-3 bg-green-500 text-white rounded hover:bg-green-600 w-80"
-      >
-        {loading ? "Registering..." : "Register Product"}
-      </button>
-
-      <ToastContainer />
+      <input id="type" placeholder="Type" className="px-2 py-1 border-2 border-black shadow-lg bg-black/20 mx-2 rounded-lg" />
+      <input id="color" placeholder="Color" className="px-2 py-1 border-2 border-black shadow-lg bg-black/20 mx-2 rounded-lg" />
+      <input id="date" placeholder="Manufacture Date" className="px-2 py-1 border-2 border-black shadow-lg bg-black/20 mx-2 rounded-lg" />
+      <button onClick={verifyProduct} className="mt-4 bg-white/70 py-2 px-4 ml-4 rounded-lg border border-black cursor-pointer">Verify</button>
+      <p className="mt-4 text-white">{status}</p>
     </div>
   );
 }
-
-export default App;

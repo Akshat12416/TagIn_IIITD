@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import VerifyProduct from './pages/VerifyProduct';
+import UserLogin from './pages/UserLogin';
+import TransferHistory from './pages/TransferHistory';
+import Inventory from './pages/Inventory';
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  //login functionality
+  const [userAddress, setUserAddress] = useState(null);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  
+      <div className='min-h-screen w-full bg-bluebg'>
+        <nav className='p-4 flex justify-between items-center text-white'>
+          <Link className='text-xl font-bold text-blue-200' to="/">Verify Product</Link>
+          <div className='space-x-4'>
+            <Link to="/login" className='text-blue-300 hover:underline'>User Login</Link>
+          </div>
+        </nav>
+
+        {/* routings */}
+        <Routes>
+          <Route path="/" element={<VerifyProduct userAddress={userAddress} />} />
+          <Route path="/login" element={<UserLogin setUserAddress={setUserAddress} />} />
+          <Route path="/inventory" element={<Inventory userAddress={userAddress} />} />
+          <Route path="/history/:tokenId" element={<TransferHistory userAddress={userAddress} />} />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+   
+  );
 }
 
-export default App
+export default App;

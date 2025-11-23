@@ -8,7 +8,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get("http://192.168.0.138:5000/api/products")
+      .get("http://192.168.161.248:5000/api/products")
       .then((res) => {
         setProducts(res.data);
         setLoading(false);

@@ -704,7 +704,7 @@ function TransferOwnership() {
         .safeTransferFrom(currentOwner, newOwner, tokenId)
         .send({ from: currentOwner });
 
-      await axios.post('http://10.21.169.255:5000/api/transfer', {
+      await axios.post('http://192.168.161.248:5000/api/transfer', {
         tokenId,
         from: currentOwner,
         to: newOwner,

@@ -8,6 +8,7 @@ import TransferOwnership from "./pages/TransferOwnership";
 import { MdFactory } from "react-icons/md";
 import { HiMenu, HiX } from "react-icons/hi";
 import Reports from "./pages/Reports";
+import Analytics from "./pages/Analytics"; 
 
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -19,6 +20,7 @@ function App() {
     { name: "Dashboard", path: "/Dashboard" },
     { name: "Transfer Ownership", path: "/transfer" },
     { name: "Reports", path: "/reports" },
+    { name: "Analytics", path: "/analytics" }, 
   ];
 
   return (
@@ -29,10 +31,13 @@ function App() {
         <Route
           path="/login"
           element={
-            <Login setIsLoggedIn={setIsLoggedIn} setUserAddress={setUserAddress} />
+            <Login
+              setIsLoggedIn={setIsLoggedIn}
+              setUserAddress={setUserAddress}
+            />
           }
         />
-        
+
         {/* Protected routes (require login) */}
         {isLoggedIn ? (
           <Route
@@ -52,14 +57,14 @@ function App() {
                       </div>
 
                       {/* Desktop Navigation links */}
-                      <div className="hidden md:flex items-center gap-4">
+                      <div className="hidden md:flex items-center gap-3">
                         <ul className="flex items-center gap-2">
                           {navItems.map((item, index) => (
                             <li key={index}>
                               <NavLink
                                 to={item.path}
                                 className={({ isActive }) =>
-                                  `block px-6 py-2.5 rounded-2xl text-sm font-medium transition-all ${
+                                  `block px-5 py-2.5 rounded-2xl text-sm font-medium transition-all ${
                                     isActive
                                       ? "bg-black text-white shadow-xl"
                                       : "text-black hover:bg-gray-50"
@@ -76,7 +81,8 @@ function App() {
                         {userAddress && (
                           <div className="ml-2">
                             <div className="px-6 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-2xl text-xs font-mono text-black transition-all">
-                              {userAddress.slice(0, 6)}...{userAddress.slice(-4)}
+                              {userAddress.slice(0, 6)}...
+                              {userAddress.slice(-4)}
                             </div>
                           </div>
                         )}
@@ -117,7 +123,8 @@ function App() {
                         {/* User Address Display (Mobile) */}
                         {userAddress && (
                           <div className="mt-4 px-6 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-mono text-black text-center">
-                            {userAddress.slice(0, 10)}...{userAddress.slice(-8)}
+                            {userAddress.slice(0, 10)}...
+                            {userAddress.slice(-8)}
                           </div>
                         )}
                       </div>
@@ -129,10 +136,15 @@ function App() {
                 <div className="min-h-[calc(100vh-5rem)]">
                   <Routes>
                     <Route path="/Dashboard" element={<Dashboard />} />
-                    <Route path="/Registerproduct" element={<Registerproduct />} />
+                    <Route
+                      path="/Registerproduct"
+                      element={<Registerproduct />}
+                    />
                     <Route path="/transfer" element={<TransferOwnership />} />
                     <Route path="/reports" element={<Reports />} />
-                    <Route path="*" element={<Navigate to="/" />} />
+                    <Route path="/analytics" element={<Analytics />} />{" "}
+                    {/* 👈 NEW */}
+                    <Route path="*" element={<Navigate to="/Dashboard" />} />
                   </Routes>
                 </div>
               </div>

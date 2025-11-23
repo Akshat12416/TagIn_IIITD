@@ -693,7 +693,7 @@ const TransferHistory = ({ userAddress }) => {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(`http://192.168.0.138:5000/api/transfers/${tokenId}`);
+      const res = await axios.get(`http://192.168.161.248:5000/api/transfers/${tokenId}`);
       setHistory(res.data);
     } catch (err) {
       console.error("Failed to fetch transfer history", err);
@@ -729,7 +729,7 @@ const TransferHistory = ({ userAddress }) => {
         .send({ from: currentOwner });
 
       // Update backend record
-      await axios.post('http://192.168.0.138:5000/api/transfer', {
+      await axios.post('http://192.168.161.248:5000/api/transfer', {
         tokenId,
         from: currentOwner,
         to: newOwner,

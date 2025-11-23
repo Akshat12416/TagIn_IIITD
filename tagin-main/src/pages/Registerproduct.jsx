@@ -692,11 +692,11 @@ export default function Registerproduct() {
   // New function to autofill demo data
   const autofillDemoData = () => {
     setForm({
-      productName: 'Casio Watch',
-      serial: '4',
-      model: 'Vintage classic',
-      type: 'Watch',
-      color: 'Silver',
+      productName: 'Adidas Switch',
+      serial: '9871',
+      model: 'Switch A3',
+      type: 'Sneaker',
+      color: 'ColorBlock',
       date: '07/11/2025'
     });
   };
@@ -723,7 +723,7 @@ export default function Registerproduct() {
         const tokenId = tx.events.ProductMinted.returnValues[0].toString();
         const details = await contract.methods.getProductDetails(tokenId).call();
 
-        await axios.post('http://192.168.0.138:5000/api/register', {
+        await axios.post('http://192.168.161.248:5000/api/register', {
           name: productName,
           serial,
           model,

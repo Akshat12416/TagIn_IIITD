@@ -1,0 +1,11 @@
+flask
+flask-pymongo
+pymongo
+torch
+torchvision
+ftfy
+regex
+tqdm
+git+https://github.com/openai/CLIP.git
+pillow
+requests

@@ -4,7 +4,6 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 const CONTRACT_ADDRESS = '0x316C2435Bb89b3100396E3285b39dDE2D21B4a56';
 const CONTRACT_ABI = [
     {
@@ -676,7 +675,6 @@ const CONTRACT_ABI = [
     }
 ];
 
-
 function TransferOwnership() {
   const [tokenId, setTokenId] = useState('');
   const [newOwner, setNewOwner] = useState('');
@@ -702,59 +700,190 @@ function TransferOwnership() {
 
       const contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
 
-      // Perform safe transfer from current owner to new owner
       await contract.methods
         .safeTransferFrom(currentOwner, newOwner, tokenId)
         .send({ from: currentOwner });
 
-      // Update MongoDB
-      await axios.post('http://172.20.10.7:5000/api/transfer', {
+      await axios.post('http://10.21.169.255:5000/api/transfer', {
         tokenId,
         from: currentOwner,
         to: newOwner,
         timestamp: new Date().toISOString()
       });
 
-      toast.success("✅ Ownership transferred successfully!");
+      toast.success("Ownership transferred successfully!");
       setTokenId('');
       setNewOwner('');
     } catch (err) {
       console.error(err);
-      toast.error("❌ Transfer failed: " + err.message);
+      toast.error("Transfer failed: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-3xl font-semibold text-purple-700 mb-6">Transfer Product Ownership</h1>
+    <div className="w-full bg-white min-h-screen">
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
-      <input
-        type="text"
-        placeholder="Enter Product Token ID"
-        value={tokenId}
-        onChange={(e) => setTokenId(e.target.value)}
-        className="mb-4 w-full p-3 border border-purple-300 rounded"
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .animate-fade-in-up {
+          animation: fadeInUp 0.6s ease-out;
+        }
+
+        .animate-slide-in-left {
+          animation: slideInLeft 0.4s ease-out backwards;
+        }
+
+        .input-field {
+          transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+          outline: none;
+          border-color: #000;
+          box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+      `}</style>
+
+      <section className="w-full">
+        <div className="w-full max-w-8xl mx-auto px-6 md:px-12 lg:px-20 xl:px-32">
+          <div className="min-h-screen flex items-center justify-center py-12 md:py-20">
+            
+            <div className="w-full max-w-2xl">
+              {/* Header */}
+              <div className="text-center mb-8 md:mb-12 animate-fade-in-up">
+                <h1 className="font-semibold text-black text-3xl md:text-5xl lg:text-6xl tracking-tight leading-tight mb-4">
+                  Transfer Ownership
+                </h1>
+                <p className="text-gray-500 text-sm md:text-base leading-relaxed">
+                  Securely transfer product ownership via blockchain transaction
+                </p>
+              </div>
+
+              {/* Form Card */}
+              <div className="bg-neutral-100 rounded-2xl border border-gray-200 p-6 md:p-8 lg:p-10 animate-fade-in-up">
+                <div className="space-y-6">
+                  
+                  {/* Token ID Input */}
+                  <div className="animate-slide-in-left stagger-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Product Token ID
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter product token ID"
+                      value={tokenId}
+                      onChange={(e) => setTokenId(e.target.value)}
+                      className="input-field w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
+
+                  {/* New Owner Address Input */}
+                  <div className="animate-slide-in-left stagger-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      New Owner Wallet Address
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="0x..."
+                      value={newOwner}
+                      onChange={(e) => setNewOwner(e.target.value)}
+                      className="input-field w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 font-mono"
+                    />
+                    <p className="mt-2 text-xs text-gray-500">
+                      Enter the Ethereum wallet address of the new owner
+                    </p>
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="flex justify-center pt-4 animate-slide-in-left stagger-3">
+                    <button
+                      onClick={handleTransfer}
+                      disabled={loading}
+                      className="px-8 py-4 bg-black hover:bg-gray-900 text-white text-base font-semibold rounded-2xl transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed min-w-[220px]"
+                    >
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Transferring...
+                        </span>
+                      ) : (
+                        "Transfer Ownership"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Info Section */}
+              <div className="mt-8 bg-white rounded-2xl border border-gray-200 p-6 animate-fade-in-up">
+                <h3 className="text-lg font-semibold text-black mb-3">
+                  How it works
+                </h3>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <span className="text-black font-bold mt-0.5">•</span>
+                    <span>Ownership will be updated on the blockchain via smart contract</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-black font-bold mt-0.5">•</span>
+                    <span>Transaction history will be recorded in the backend database</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-black font-bold mt-0.5">•</span>
+                    <span>You must be the current owner to transfer the product</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-black font-bold mt-0.5">•</span>
+                    <span>MetaMask will prompt you to confirm the transaction</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
       />
-
-      <input
-        type="text"
-        placeholder="Enter New Owner Wallet Address"
-        value={newOwner}
-        onChange={(e) => setNewOwner(e.target.value)}
-        className="mb-6 w-full p-3 border border-purple-300 rounded"
-      />
-
-      <button
-        onClick={handleTransfer}
-        disabled={loading}
-        className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 w-full"
-      >
-        {loading ? 'Transferring...' : 'Transfer Ownership'}
-      </button>
-
-      <ToastContainer />
     </div>
   );
 }

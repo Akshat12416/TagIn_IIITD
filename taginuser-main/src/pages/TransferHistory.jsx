@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Your contract details
+// contract details
 const CONTRACT_ADDRESS = '0x316C2435Bb89b3100396E3285b39dDE2D21B4a56';
 const CONTRACT_ABI = [
     {
@@ -677,7 +677,6 @@ const CONTRACT_ABI = [
     }
 ];
 
-
 const TransferHistory = ({ userAddress }) => {
   const { tokenId } = useParams();
   const navigate = useNavigate();
@@ -694,7 +693,7 @@ const TransferHistory = ({ userAddress }) => {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(`http://172.20.10.7:5000/api/transfers/${tokenId}`);
+      const res = await axios.get(`http://192.168.0.138:5000/api/transfers/${tokenId}`);
       setHistory(res.data);
     } catch (err) {
       console.error("Failed to fetch transfer history", err);
@@ -730,7 +729,7 @@ const TransferHistory = ({ userAddress }) => {
         .send({ from: currentOwner });
 
       // Update backend record
-      await axios.post('http://172.20.10.7:5000/api/transfer', {
+      await axios.post('http://192.168.0.138:5000/api/transfer', {
         tokenId,
         from: currentOwner,
         to: newOwner,
@@ -749,50 +748,88 @@ const TransferHistory = ({ userAddress }) => {
   };
 
   return (
-    <div className="p-6 text-white min-h-screen bg-bluebg">
-      <h1 className="text-2xl font-semibold mb-4">Transfer History for Token ID: {tokenId}</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6 md:p-8 lg:p-12">
+      <div className="max-w-5xl mx-auto">
+        {/* Page Title */}
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-wide text-black mb-8">
+          Transfer History for Token ID: {tokenId}
+        </h1>
 
-      <div className="bg-white text-black rounded-lg p-4 shadow-xl mb-8">
-        {history.length === 0 ? (
-          <p>No transfer records found.</p>
-        ) : (
-          <ul className="space-y-2">
-            {history.map((entry, idx) => (
-              <li key={idx} className="p-2 border-b border-gray-200">
-                <p><strong>From:</strong> <span className="font-mono">{entry.from}</span></p>
-                <p><strong>To:</strong> <span className="font-mono">{entry.to}</span></p>
-                <p className="text-sm text-gray-600">
-                  {new Date(entry.timestamp).toLocaleString()}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
+        {/* History Section */}
+        <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 mb-8 border border-gray-200">
+          <h2 className="text-2xl font-bold text-black mb-6">Transaction History</h2>
+          
+          {history.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-lg">No transfer records found.</p>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {history.map((entry, idx) => (
+                <li 
+                  key={idx} 
+                  className="p-5 rounded-2xl border border-gray-200 hover:shadow-md transition-all bg-gray-50"
+                >
+                  <div className="space-y-2">
+                    <div>
+                      <span className="font-semibold text-black text-sm">From:</span>
+                      <p className="font-mono text-gray-700 text-xs mt-1 break-all">
+                        {entry.from}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-black text-sm">To:</span>
+                      <p className="font-mono text-gray-700 text-xs mt-1 break-all">
+                        {entry.to}
+                      </p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+                      {new Date(entry.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Ownership Transfer Section */}
+        <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-gray-200">
+          <h2 className="text-2xl font-bold mb-4 text-black">Transfer Ownership</h2>
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            You are the current owner. Enter the new wallet address to transfer ownership:
+          </p>
+
+          <input
+            type="text"
+            placeholder="Recipient Wallet Address (0x...)"
+            value={newOwner}
+            onChange={(e) => setNewOwner(e.target.value)}
+            className="mb-6 w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-black transition-all font-mono text-sm"
+          />
+
+          <button
+            onClick={handleTransfer}
+            disabled={loading}
+            className="bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-xl transition-all w-full font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Transferring..." : "Transfer Now"}
+          </button>
+        </div>
       </div>
 
-      {/* Ownership Transfer Section */}
-      <div className="bg-white text-black rounded-lg p-6 shadow-xl">
-        <h2 className="text-xl font-semibold mb-4 text-purple-700">Transfer Ownership</h2>
-        <p className="text-gray-700 mb-2">You are the current owner. Enter the new wallet address to transfer ownership:</p>
-
-        <input
-          type="text"
-          placeholder="Recipient Wallet Address"
-          value={newOwner}
-          onChange={(e) => setNewOwner(e.target.value)}
-          className="mb-4 w-full p-3 border border-purple-300 rounded"
-        />
-
-        <button
-          onClick={handleTransfer}
-          disabled={loading}
-          className="bg-purple-600 text-white px-6 py-3 rounded hover:bg-purple-700 w-full transition"
-        >
-          {loading ? "Transferring..." : "Transfer Now"}
-        </button>
-      </div>
-
-      <ToastContainer />
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const UserLogin = ({ setUserAddress }) => {
   const [web3, setWeb3] = useState(null);
-  const [status, setStatus] = useState("Connect with MetaMask to continue"); 
+  const [status, setStatus] = useState("Connect with MetaMask to continue");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,14 +30,23 @@ const UserLogin = ({ setUserAddress }) => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-purple-300 to-purple-50">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-[400px] flex flex-col items-center space-y-6">
-        <FaEthereum className="text-purple-500 text-4xl" />
-        <h1 className="text-2xl font-semibold text-gray-800">User Login</h1>
+    <div
+      className="flex items-center justify-center min-h-screen p-6"
+      style={{
+        backgroundColor: "#fff",
+        backgroundImage:
+          "linear-gradient(90deg, #f7f7f7 1px, transparent 1px), linear-gradient(180deg, #f7f7f7 1px, transparent 1px)",
+        backgroundSize: "40px 40px",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div className="bg-white p-8 rounded-2xl shadow-md w-[400px] flex flex-col items-center space-y-6 border border-gray-200">
+        <FaEthereum className="text-gray-800 text-4xl" />
+        <h1 className="text-2xl font-semibold text-gray-900">User Login</h1>
         <p className="text-sm text-center text-gray-600">{status}</p>
         <button
           onClick={handleLogin}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+          className="bg-gray-800 hover:bg-black text-white font-medium py-2 px-4 rounded-lg transition w-full"
         >
           Connect with MetaMask
         </button>
